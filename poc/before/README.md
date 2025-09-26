@@ -64,6 +64,7 @@ The `entryGradeLevelDescriptor` is formatted as: `uri://ed-fi.org/GradeLevelDesc
 ## Features
 
 - Authenticates with Ed-Fi ODS/API using OAuth 2.0 client credentials flow
+- Uses the Discovery API to automatically find the correct data management API endpoints (with fallback to default paths)
 - Reads student data from `students.csv` file
 - Creates student records first, then student-school associations
 - Handles optional fields (empty values are excluded from API calls)

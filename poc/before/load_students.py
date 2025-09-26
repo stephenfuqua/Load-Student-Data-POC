@@ -29,7 +29,35 @@ class EdFiApiClient:
         self.client_secret = client_secret
         self.access_token = None
         self.session = requests.Session()
+        self.data_management_api_base_url = None
     
+    def discover_data_management_api_base_url(self) -> bool:
+        """Use Discovery API to find the data management API base URL"""
+        discovery_url = f"{self.base_url}/api"
+        
+        try:
+            response = self.session.get(discovery_url)
+            response.raise_for_status()
+            
+            discovery_data = response.json()
+            
+            # Look for the data management API in the URLs
+            for url_info in discovery_data.get('urls', []):
+                if url_info.get('name') == 'data':
+                    self.data_management_api_base_url = url_info.get('url')
+                    logger.info(f"Discovered data management API base URL: {self.data_management_api_base_url}")
+                    return True
+            
+            # Fallback to the default path if not found in discovery
+            self.data_management_api_base_url = f"{self.base_url}/data/v3/ed-fi"
+            logger.warning("Could not find data management API URL in discovery, using default: /data/v3/ed-fi")
+            return True
+            
+        except requests.RequestException as e:
+            logger.warning(f"Discovery API call failed: {e}, falling back to default data management API path")
+            self.data_management_api_base_url = f"{self.base_url}/data/v3/ed-fi"
+            return True
+
     def authenticate(self) -> bool:
         """Authenticate with the Ed-Fi API and get access token"""
         auth_url = f"{self.base_url}/oauth/token"
@@ -53,7 +81,9 @@ class EdFiApiClient:
                     'Content-Type': 'application/json'
                 })
                 logger.info("Successfully authenticated with Ed-Fi API")
-                return True
+                
+                # After authentication, discover the data management API base URL
+                return self.discover_data_management_api_base_url()
             else:
                 logger.error("No access token received from authentication")
                 return False
@@ -64,7 +94,7 @@ class EdFiApiClient:
     
     def post_student(self, student_data: Dict[str, Any]) -> bool:
         """POST student data to the students endpoint"""
-        endpoint = f"{self.base_url}/data/v3/ed-fi/students"
+        endpoint = f"{self.data_management_api_base_url}/students"
         
         try:
             response = self.session.post(endpoint, json=student_data)
@@ -80,7 +110,7 @@ class EdFiApiClient:
     
     def post_student_school_association(self, association_data: Dict[str, Any]) -> bool:
         """POST student school association data to the studentSchoolAssociations endpoint"""
-        endpoint = f"{self.base_url}/data/v3/ed-fi/studentSchoolAssociations"
+        endpoint = f"{self.data_management_api_base_url}/studentSchoolAssociations"
         
         try:
             response = self.session.post(endpoint, json=association_data)
