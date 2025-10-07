@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "load-student-data-poc"
+version = "0.1.0"
+description = "POC for loading student data into Ed-Fi ODS/API"
+authors = ["Stephen Fuqua"]
+readme = "README.md"
+package-mode = false
+
+[tool.poetry.dependencies]
+python = "^3.8"
+requests = "^2.31.0"
+python-dotenv = "^1.0.0"
+pandas = "^2.0.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
