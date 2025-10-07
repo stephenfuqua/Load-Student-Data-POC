@@ -1,0 +1,15 @@
+[tool.poetry]
+name = "poc-six"
+version = "0.1.0"
+description = "POC 6: Load Student Data using Ed-Fi SDK MCP"
+authors = ["Ed-Fi Alliance"]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+requests = "^2.31.0"
+pandas = "^2.0.0"
+python-dotenv = "^1.0.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
